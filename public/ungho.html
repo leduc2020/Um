@@ -1,138 +1,72 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ủng Hộ Tôi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ủng Hộ Tôi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100 min-h-screen">
-    <div class="container mx-auto px-4 py-8 max-w-4xl">
-        <header class="text-center mb-10">
-            <h1 class="text-4xl font-bold text-sky-700 mb-4">Cảm Ơn Sự Ủng Hộ Của Bạn!</h1>
-            <p class="text-lg text-gray-600">Mỗi sự ủng hộ của bạn sẽ giúp tôi có thêm động lực để tạo ra nhiều nội dung chất lượng hơn.</p>
-        </header>
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <header class="text-center mb-10">
+      <h1 class="text-4xl font-bold text-sky-700 mb-4">Cảm Ơn Sự Ủng Hộ Của Bạn!</h1>
+      <p class="text-lg text-gray-600">Mỗi sự ủng hộ của bạn sẽ giúp tôi có thêm động lực để tạo ra nhiều nội dung chất lượng hơn.</p>
+    </header>
 
-        <main class="space-y-8">
-            <section class="bg-white p-6 rounded-2xl shadow-xl">
-                <h2 class="text-2xl font-semibold text-sky-700 mb-4">Lời Nhắn</h2>
-                <p class="text-gray-700 mb-4">Xin chào! Tôi rất vui khi bạn ghé thăm trang này. Nếu bạn thấy những nội dung của tôi hữu ích và muốn ủng hộ, bạn có thể chuyển khoản qua một trong các phương thức dưới đây.</p>
-                <p class="text-gray-700">Mọi sự ủng hộ dù nhỏ đều được trân trọng và là nguồn động viên lớn đối với tôi. Cảm ơn bạn rất nhiều!</p>
-            </section>
+    <main class="space-y-8">
+      <section class="bg-white p-6 rounded-2xl shadow-xl">
+        <h2 class="text-2xl font-semibold text-sky-700 mb-4">Lời Nhắn</h2>
+        <p class="text-gray-700 mb-4">Xin chào! Tôi rất vui khi bạn ghé thăm trang này. Nếu bạn thấy những nội dung của tôi hữu ích và muốn ủng hộ, bạn có thể chuyển khoản qua mã QR bên dưới.</p>
+        <p class="text-gray-700">Mọi sự ủng hộ dù nhỏ đều được trân trọng và là nguồn động viên lớn đối với tôi. Cảm ơn bạn rất nhiều!</p>
+      </section>
 
-            <section id="chuyenkhoan" class="mt-10 bg-white p-6 rounded-2xl shadow-xl space-y-6">
-                <h2 class="text-xl font-semibold text-sky-700 mb-4">Thông Tin Chuyển Khoản</h2>
-              
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-sky-50 p-4 rounded-xl shadow">
-                  <div class="flex items-center gap-3">
-                    <img src="https://files.catbox.moe/tboxzz.jpg" alt="BVBank" class="w-10 h-10 rounded-full">
-                    <div>
-                      <div class="font-semibold text-sky-700">BVBANK</div>
-                      <div id="mbbank-number" class="text-gray-800">99ZP25180M09718590</div>
-                    </div>
-                  </div>
-                  <div class="flex gap-3">
-                    <button onclick="copyAccount('99ZP25180M09718590', 'BVBANK')" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-full shadow transition-all duration-300">
-                      📋 Copy
-                    </button>
-                    <button onclick="showQR('970422', '99ZP25180M09718590', 'ZALOPAY_LE NGOC THUY LINH')" class="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium px-4 py-2 rounded-full shadow transition-all duration-300">
-                      📱 QR Code
-                    </button>
-                  </div>
-                </div>
-              
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-green-50 p-4 rounded-xl shadow">
-                  <div class="flex items-center gap-3">
-                    <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/02/Icon-Vietcombank.png" alt="Vietcombank" class="w-10 h-10 rounded-full">
-                    <div>
-                      <div class="font-semibold text-green-700">VIETCOMBANK</div>
-                      <div id="vcb-number" class="text-gray-800"></div>
-                    </div>
-                  </div>
-                  <div class="flex gap-3">
-                    <button onclick="copyAccount('', 'VIETCOMBANK')" class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-full shadow transition-all duration-300">
-                      📋 Copy
-                    </button>
-                    <button onclick="showQR('970436', '', '')" class="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium px-4 py-2 rounded-full shadow transition-all duration-300">
-                      📱 QR Code
-                    </button>
-                  </div>
-                </div>
-              
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-pink-50 p-4 rounded-xl shadow">
-                  <div class="flex items-center gap-3">
-                    <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-MoMo-Square.png" alt="MoMo" class="w-10 h-10 rounded-full">
-                    <div>
-                      <div class="font-semibold text-pink-600">MOMO</div>
-                      <div id="momo-number" class="text-gray-800"></div>
-                    </div>
-                  </div>
-                  <div class="flex gap-3">
-                    <button onclick="copyAccount('', 'MOMO')" class="flex items-center gap-2 bg-pink-600 hover:bg-pink-700 text-white text-sm font-medium px-4 py-2 rounded-full shadow transition-all duration-300">
-                      📋 Copy
-                    </button>
-                    <button onclick="showMomoQR('')" class="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium px-4 py-2 rounded-full shadow transition-all duration-300">
-                      📱 QR Code
-                    </button>
-                  </div>
-                </div>
-              
-                <div id="notify" class="text-green-600 font-medium text-center hidden"></div>
-                <div id="qr-container" class="mt-4 hidden">
-                  <img id="qr-image" src="" alt="QR Code" class="w-60 mx-auto rounded border shadow">
-                </div>
-            </section>
+      <section id="chuyenkhoan" class="mt-10 bg-white p-6 rounded-2xl shadow-xl space-y-6 text-center">
+        <h2 class="text-xl font-semibold text-sky-700 mb-4">Ủng Hộ Qua QR Code</h2>
 
-            <section class="bg-white p-6 rounded-2xl shadow-xl text-center">
-                <h2 class="text-2xl font-semibold text-sky-700 mb-4">Lời Cảm Ơn</h2>
-                <p class="text-gray-700 mb-4">Một lần nữa, tôi xin chân thành cảm ơn sự ủng hộ của bạn. Đây không chỉ là sự hỗ trợ về mặt tài chính mà còn là nguồn động viên tinh thần vô cùng quý giá.</p>
-                <p class="text-gray-700">Nếu bạn có bất kỳ câu hỏi hoặc yêu cầu nào, đừng ngần ngại liên hệ với tôi qua email hoặc mạng xã hội.</p>
-            </section>
-        </main>
+        <img src="https://files.catbox.moe/39w610.png" alt="QR Thùy Linh" class="w-72 mx-auto rounded-xl shadow-xl border border-gray-300">
+        
+        <p class="text-gray-700 mt-4">Quét mã bằng ứng dụng ngân hàng / ví để ủng hộ Thùy Linh nhé 💖</p>
 
-        <footer class="mt-12 text-center text-gray-500 text-sm">
-            <p>© 2025 Bản quyền thuộc về Nguyễn Đinh Tiến Dũng. Mọi quyền được bảo lưu.</p>
-        </footer>
-    </div>
+        <div class="mt-6">
+          <p class="font-semibold text-sky-700">STK: 99ZP25180M09718590 (BVBank)</p>
+          <button onclick="copyAccount('99ZP25180M09718590', 'BVBANK')" class="mt-3 flex items-center gap-2 mx-auto bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-full shadow transition-all duration-300">
+            📋 Copy STK
+          </button>
+        </div>
 
-    <script>
-        function copyAccount(accountNumber, bankName) {
-            navigator.clipboard.writeText(accountNumber).then(() => {
-                const notify = document.getElementById('notify');
-                notify.textContent = `Đã copy số tài khoản ${bankName}: ${accountNumber}`;
-                notify.classList.remove('hidden');
-                
-                setTimeout(() => {
-                    notify.classList.add('hidden');
-                }, 3000);
-            });
-        }
+        <div id="notify" class="text-green-600 font-medium text-center hidden mt-4"></div>
+      </section>
 
-        function showQR(bin, accountNumber, accountName) {
-            const qrImage = document.getElementById('qr-image');
-            const qrContainer = document.getElementById('qr-container');
-            
+      <section class="bg-white p-6 rounded-2xl shadow-xl text-center">
+        <h2 class="text-2xl font-semibold text-sky-700 mb-4">Lời Cảm Ơn</h2>
+        <p class="text-gray-700 mb-4">Một lần nữa, tôi xin chân thành cảm ơn sự ủng hộ của bạn. Đây không chỉ là sự hỗ trợ về mặt tài chính mà còn là nguồn động viên tinh thần vô cùng quý giá.</p>
+        <p class="text-gray-700">Nếu bạn có bất kỳ câu hỏi hoặc yêu cầu nào, đừng ngần ngại liên hệ với tôi qua email hoặc mạng xã hội.</p>
+      </section>
+    </main>
 
-            const qrUrl = `https://api.vietqr.io/image/${bin}-${accountNumber}-Nguyen%20Dinh%20Tien%20Dung.png)}`;
-            
-            qrImage.src = qrUrl;
-            qrContainer.classList.remove('hidden');
-            
-            qrContainer.scrollIntoView({ behavior: 'smooth' });
-        }
+    <footer class="mt-12 text-center text-gray-500 text-sm">
+      <p>© 2025 Bản quyền thuộc về Nguyễn Đinh Tiến Dũng. Mọi quyền được bảo lưu.</p>
+    </footer>
+  </div>
 
-        function showMomoQR(phoneNumber) {
-            const qrImage = document.getElementById('qr-image');
-            const qrContainer = document.getElementById('qr-container');
-            
-            const qrUrl = `https://momosv3.apimienphi.com/api/QRCode?phone=${phoneNumber}`;
-            
-            qrImage.src = qrUrl;
-            qrContainer.classList.remove('hidden');
-            
-            qrContainer.scrollIntoView({ behavior: 'smooth' });
-        }
-    </script>
+  <script>
+    function copyAccount(accountNumber, bankName) {
+      if (!accountNumber) {
+        alert("Không có số tài khoản để copy.");
+        return;
+      }
+
+      navigator.clipboard.writeText(accountNumber).then(() => {
+        const notify = document.getElementById('notify');
+        notify.textContent = `✅ Đã copy số tài khoản ${bankName}: ${accountNumber}`;
+        notify.classList.remove('hidden');
+
+        setTimeout(() => {
+          notify.classList.add('hidden');
+        }, 3000);
+      });
+    }
+  </script>
 </body>
 </html>
