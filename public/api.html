@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài liệu API - Chuyển đổi URL hình ảnh</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #10b981;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
+        
+        .dark-mode {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #94a3b8;
+            --background: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f1f5f9;
+            --border: #334155;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-align: center;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .theme-toggle {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .theme-toggle:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .api-overview {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+        
+        .api-overview h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .api-overview h2 i {
+            font-size: 1.3rem;
+        }
+        
+        .api-overview p {
+            margin-bottom: 15px;
+            color: var(--secondary);
+            font-size: 1rem;
+        }
+        
+        .endpoint-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+        
+        .endpoint-header {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .method {
+            background: var(--primary);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            width: fit-content;
+        }
+        
+        .url {
+            font-family: monospace;
+            font-size: 1rem;
+            color: var(--text);
+            overflow-x: auto;
+            padding: 5px 0;
+            word-break: break-all;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            margin: 20px 0 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            font-size: 1rem;
+        }
+        
+        .parameters {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        
+        .parameters th {
+            text-align: left;
+            padding: 10px;
+            background: var(--background);
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .parameters td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .param-name {
+            font-family: monospace;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        .param-required {
+            background: var(--success);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        
+        .examples {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .example-card {
+            background: var(--background);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid var(--border);
+        }
+        
+        .example-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .example-code {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+        
+        .response-schema {
+            background: var(--background);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-family: monospace;
+            white-space: pre;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        
+        .note {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 15px 0;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+        
+        .dark-mode .note {
+            background: #3e2b00;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .status-codes {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .status-code {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+        }
+        
+        .status-code h4 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .status-200 {
+            color: var(--success);
+        }
+        
+        .status-400 {
+            color: #f97316;
+        }
+        
+        .status-404 {
+            color: #8b5cf6;
+        }
+        
+        .status-500 {
+            color: #ef4444;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 25px 0;
+            margin-top: 30px;
+            color: var(--secondary);
+            border-top: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+        
+        code {
+            background: var(--background);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+        
+        @media (min-width: 768px) {
+            header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                text-align: left;
+            }
+            
+            .logo {
+                margin-bottom: 0;
+                flex-direction: row;
+            }
+            
+            .logo h1 {
+                text-align: left;
+            }
+            
+            .controls {
+                width: auto;
+                justify-content: flex-end;
+            }
+            
+            .endpoint-header {
+                flex-direction: row;
+                align-items: center;
+            }
+            
+            .status-codes {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            
+            .status-code {
+                flex: 1;
+                min-width: calc(50% - 10px);
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .status-code {
+                min-width: calc(25% - 15px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-exchange-alt"></i>
+                <h1>API Chuyển đổi URL hình ảnh</h1>
+            </div>
+            <div class="controls">
+                <button id="theme-toggle" class="theme-toggle">
+                    <i class="fas fa-moon"></i> <span class="theme-text">Chế độ tối</span>
+                </button>
+            </div>
+        </header>
+        
+        <section class="api-overview">
+            <h2><i class="fas fa-info-circle"></i> Tổng quan API</h2>
+            <p>API này cung cấp chức năng chuyển đổi URL hình ảnh, cho phép bạn tải lên và chuyển đổi một URL hình ảnh từ bên ngoài thành URL mới được lưu trữ trên máy chủ của chúng tôi.</p>
+            <p>Endpoint này sử dụng phương thức GET và nhận một tham số truy vấn là <code>url</code> chứa URL hình ảnh cần chuyển đổi.</p>
+            <div class="note">
+                <p><strong>Lưu ý quan trọng:</strong> API chỉ hỗ trợ các định dạng hình ảnh, video, âm thanh, ...,  được công khai.</p>
+            </div>
+        </section>
+        
+        <section class="endpoint-card">
+            <div class="endpoint-header">
+                <div class="method">GET</div>
+                <div class="url" id="api-endpoint">/api/convert?url=&lt;URL_HÌNH_ẢNH_CẦN_CHUYỂN_ĐỔI&gt;</div>
+            </div>
+            
+            <h3 class="section-title"><i class="fas fa-list"></i> Tham số</h3>
+            <table class="parameters">
+                <thead>
+                    <tr>
+                        <th>Tên tham số</th>
+                        <th>Vị trí</th>
+                        <th>Bắt buộc</th>
+                        <th>Mô tả</th>
+                        <th>Ví dụ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="param-name">url</td>
+                        <td>Query</td>
+                        <td><span class="param-required">Bắt buộc</span></td>
+                        <td>URL hình ảnh cần chuyển đổi. URL phải được mã hóa đúng cách (URL encoded) và phải trỏ trực tiếp đến tệp hình ảnh.</td>
+                        <td>https://example.com/images/photo.jpg</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3 class="section-title"><i class="fas fa-code"></i> Ví dụ sử dụng</h3>
+            <div class="examples">
+                <div class="example-card">
+                    <div class="example-title"><i class="fas fa-terminal"></i> Yêu cầu cURL</div>
+                    <div class="example-code" id="curl-example">curl -X GET "/api/convert?url=https%3A%2F%2Fi.ibb.co%2FJWLLvHf8%2Flogo.jpg"</div>
+                </div>
+                
+                <div class="example-card">
+                    <div class="example-title"><i class="fab fa-js"></i> JavaScript (Fetch API)</div>
+                    <div class="example-code" id="js-example">const imageUrl = encodeURIComponent('https://i.ibb.co/JWLLvHf8/logo.jpg');
+fetch(`/api/convert?url=${imageUrl}`)
+  .then(response => response.json())
+  .then(data => {
+    console.log('URL gốc:', data.originalUrl);
+    console.log('URL mới:', data.convertedUrl);
+  })
+  .catch(error => console.error('Lỗi:', error));</div>
+                </div>
+                
+                <div class="example-card">
+                    <div class="example-title"><i class="fab fa-python"></i> Python (Requests)</div>
+                    <div class="example-code" id="python-example">import requests
+from urllib.parse import quote
+
+base_url = "/api/convert"
+image_url = "https://i.ibb.co/JWLLvHf8/logo.jpg"
+encoded_url = quote(image_url, safe='')
+
+try:
+    response = requests.get(f"{base_url}?url={encoded_url}")
+    data = response.json()
+    print("URL gốc:", data["originalUrl"])
+    print("URL mới:", data["convertedUrl"])
+except Exception as e:
+    print("Lỗi:", str(e))</div>
+                </div>
+            </div>
+            
+            <h3 class="section-title"><i class="fas fa-reply"></i> Phản hồi thành công</h3>
+            <p>API sẽ trả về dữ liệu dạng JSON với cấu trúc sau khi thành công:</p>
+            
+            <div class="response-schema">{
+  "success": true,
+  "originalUrl": "https://i.ibb.co/JWLLvHf8/logo.jpg",
+  "convertedUrl": "/uploads/converted-1749108026752-lb3ygu0p2.jpg"
+}</div>
+            
+            <h3 class="section-title"><i class="fas fa-file-code"></i> Định nghĩa phản hồi</h3>
+            <table class="parameters">
+                <thead>
+                    <tr>
+                        <th>Thuộc tính</th>
+                        <th>Kiểu dữ liệu</th>
+                        <th>Mô tả</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="param-name">success</td>
+                        <td>boolean</td>
+                        <td>Trạng thái của yêu cầu (true = thành công, false = thất bại)</td>
+                    </tr>
+                    <tr>
+                        <td class="param-name">originalUrl</td>
+                        <td>string</td>
+                        <td>URL hình ảnh gốc được cung cấp trong yêu cầu</td>
+                    </tr>
+                    <tr>
+                        <td class="param-name">convertedUrl</td>
+                        <td>string</td>
+                        <td>Đường dẫn tương đối của hình ảnh sau khi đã được tải lên và chuyển đổi</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 class="section-title"><i class="fas fa-times-circle"></i> Phản hồi lỗi</h3>
+            <p>Khi có lỗi xảy ra, API sẽ trả về dữ liệu dạng JSON với cấu trúc sau:</p>
+            
+            <div class="response-schema">{
+  "success": false,
+  "error": "Mô tả lỗi chi tiết",
+  "code": "Mã lỗi (nếu có)"
+}</div>
+
+            <h3 class="section-title"><i class="fas fa-exclamation-circle"></i> Mã trạng thái</h3>
+            <div class="status-codes">
+                <div class="status-code">
+                    <h4 class="status-200"><i class="fas fa-check-circle"></i> 200 OK</h4>
+                    <p>Yêu cầu thành công. Hình ảnh đã được chuyển đổi và URL mới trả về trong phản hồi.</p>
+                </div>
+                <div class="status-code">
+                    <h4 class="status-400"><i class="fas fa-exclamation-triangle"></i> 400 Bad Request</h4>
+                    <p>Yêu cầu không hợp lệ. Thường do: thiếu tham số url, URL không đúng định dạng, không phải URL hình ảnh, hoặc hình ảnh vượt quá kích thước cho phép.</p>
+                </div>
+                <div class="status-code">
+                    <h4 class="status-404"><i class="fas fa-question-circle"></i> 404 Not Found</h4>
+                    <p>Không tìm thấy hình ảnh tại URL cung cấp hoặc URL không tồn tại.</p>
+                </div>
+                <div class="status-code">
+                    <h4 class="status-500"><i class="fas fa-times-circle"></i> 500 Internal Server Error</h4>
+                    <p>Lỗi máy chủ nội bộ. Có sự cố xảy ra khi xử lý yêu cầu.</p>
+                </div>
+            </div>
+            
+            <div class="note">
+                <p><strong>Lưu ý bảo mật:</strong> API này chỉ chấp nhận các URL hình ảnh từ các nguồn công khai. Không sử dụng API để tải lên hình ảnh từ các nguồn yêu cầu xác thực hoặc hình ảnh nhạy cảm.</p>
+            </div>
+        </section>
+        
+        <footer>
+            <p>© 2023 API Chuyển đổi URL hình ảnh | Phiên bản 1.0.2</p>
+            <p>Tài liệu được cập nhật lần cuối: <span id="current-date"></span></p>
+        </footer>
+    </div>
+    
+    <script>
+        // Tự động nhận domain hiện tại
+        const currentDomain = window.location.origin;
+        const apiPath = '/api/convert';
+        const fullApiUrl = `${currentDomain}${apiPath}`;
+        
+        // Cập nhật các ví dụ với domain hiện tại
+        document.getElementById('api-endpoint').textContent = fullApiUrl + '?url=<URL_HÌNH_ẢNH_CẦN_CHUYỂN_ĐỔI>';
+        
+        const exampleUrl = 'https://i.ibb.co/JWLLvHf8/logo.jpg';
+        const encodedExampleUrl = encodeURIComponent(exampleUrl);
+        
+        document.getElementById('curl-example').textContent = 
+            `curl -X GET "${fullApiUrl}?url=${encodedExampleUrl}"`;
+            
+        document.getElementById('js-example').textContent = 
+`const imageUrl = encodeURIComponent('${exampleUrl}');
+fetch(\`${fullApiUrl}?url=\${imageUrl}\`)
+  .then(response => response.json())
+  .then(data => {
+    console.log('URL gốc:', data.originalUrl);
+    console.log('URL mới:', data.convertedUrl);
+  })
+  .catch(error => console.error('Lỗi:', error));`;
+
+        document.getElementById('python-example').textContent = 
+`import requests
+from urllib.parse import quote
+
+base_url = "${fullApiUrl}"
+image_url = "${exampleUrl}"
+encoded_url = quote(image_url, safe='')
+
+try:
+    response = requests.get(f"{base_url}?url={encoded_url}")
+    data = response.json()
+    print("URL gốc:", data["originalUrl"])
+    print("URL mới:", data["convertedUrl"])
+except Exception as e:
+    print("Lỗi:", str(e))`;
+
+        // Cập nhật ngày hiện tại
+        const now = new Date();
+        const formattedDate = now.toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+        document.getElementById('current-date').textContent = formattedDate;
+
+        // Chức năng chuyển đổi chế độ tối/sáng
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
+        const themeText = document.querySelector('.theme-text');
+        
+        // Kiểm tra cài đặt chủ đề
+        const savedTheme = localStorage.getItem('theme') || 
+                         (window.matchMedia('(prefers-color-scheme: dark').matches ? 'dark' : 'light');
+        
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+            themeText.textContent = 'Chế độ sáng';
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+                themeText.textContent = 'Chế độ sáng';
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeIcon.classList.replace('fa-sun', 'fa-moon');
+                themeText.textContent = 'Chế độ tối';
+            }
+        });
+    </script>
+</body>
+</html>

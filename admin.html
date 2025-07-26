@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản trị Upload</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+ 
+  <style>
+    :root {
+      --primary-color: #4e73df;
+      --secondary-color: #f8f9fc;
+      --success-color: #1cc88a;
+      --info-color: #36b9cc;
+      --warning-color: #f6c23e;
+      --danger-color: #e74a3b;
+    }
+    
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: var(--secondary-color);
+    }
+    
+    .sidebar {
+      background: linear-gradient(180deg, var(--primary-color) 0%, #224abe 100%);
+      min-height: 100vh;
+      width: 250px;
+      position: fixed;
+      transition: all 0.3s;
+      z-index: 1000;
+    }
+    
+    .sidebar .nav-item .nav-link {
+      color: white !important;
+    }
+
+    .sidebar .nav-item .nav-link.active {
+      color: white !important;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .main-content {
+      margin-left: 250px;
+      padding: 20px;
+      transition: all 0.3s;
+    }
+    
+    .card {
+      border: none;
+      border-radius: 0.35rem;
+      box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    }
+    
+    .stat-card {
+      border-left: 0.25rem solid;
+    }
+    
+    .stat-card.primary {
+      border-left-color: var(--primary-color);
+    }
+    
+    .stat-card.success {
+      border-left-color: var(--success-color);
+    }
+    
+    .stat-card.info {
+      border-left-color: var(--info-color);
+    }
+    
+    .stat-card.warning {
+      border-left-color: var(--warning-color);
+    }
+    
+    .file-preview {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    
+    .pagination .page-item.active .page-link {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    
+    .form-select {
+      min-width: 100px;
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar {
+        margin-left: -250px;
+      }
+      .main-content {
+        margin-left: 0;
+      }
+      .sidebar.active {
+        margin-left: 0;
+      }
+      .main-content.active {
+        margin-left: 250px;
+      }
+      
+      .form-select {
+        margin-bottom: 5px;
+      }
+      
+      .card-header .d-flex {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .card-header .d-flex > * {
+        width: 100%;
+        margin-bottom: 5px;
+      }
+      
+      .card-header .d-flex > button {
+        width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar text-white">
+    <div class="p-4">
+      <h4 class="text-center mb-4">Upload Manager</h4>
+      <hr>
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link active" href="#dashboard" data-bs-toggle="tab">
+            <i class="fas fa-fw fa-tachometer-alt me-2"></i>Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#files" data-bs-toggle="tab">
+            <i class="fas fa-fw fa-file me-2"></i>Quản lý File
+          </a>
+        </li>
+        <li class="nav-item">
+  <a class="nav-link" href="#announcement" data-bs-toggle="tab">
+    <i class="fas fa-fw fa-bullhorn me-2"></i>Thông báo
+  </a>
+</li>
+        <li class="nav-item">
+          <a class="nav-link" href="#settings" data-bs-toggle="tab">
+            <i class="fas fa-fw fa-cog me-2"></i>Cài đặt
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <nav class="navbar navbar-expand navbar-light bg-white shadow mb-4">
+      <div class="container-fluid">
+        <button class="btn btn-link d-md-none rounded-circle me-3" id="sidebarToggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+              <i class="fas fa-user-circle me-1"></i>
+              <span id="usernameDisplay">Admin</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                <i class="fas fa-key me-2"></i>Đổi mật khẩu
+              </a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/admin/logout">
+                <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+              </a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="tab-content">
+      <div class="tab-pane fade show active" id="dashboard">
+        <div class="row mb-4">
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card primary h-100">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col">
+                    <h6 class="text-uppercase mb-0">Tổng số file</h6>
+                    <h2 class="mb-0" id="totalFiles">0</h2>
+                  </div>
+                  <div class="col-auto">
+                    <i class="fas fa-file fa-2x text-gray-300"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card success h-100">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col">
+                    <h6 class="text-uppercase mb-0">Dung lượng</h6>
+                    <h2 class="mb-0" id="totalSize">0 MB</h2>
+                  </div>
+                  <div class="col-auto">
+                    <i class="fas fa-database fa-2x text-gray-300"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card info h-100">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col">
+                    <h6 class="text-uppercase mb-0">Hình ảnh</h6>
+                    <h2 class="mb-0" id="imageCount">0</h2>
+                  </div>
+                  <div class="col-auto">
+                    <i class="fas fa-image fa-2x text-gray-300"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card warning h-100">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col">
+                    <h6 class="text-uppercase mb-0">Video</h6>
+                    <h2 class="mb-0" id="videoCount">0</h2>
+                  </div>
+                  <div class="col-auto">
+                    <i class="fas fa-video fa-2x text-gray-300"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-lg-8 mb-4">
+            <div class="card shadow h-100">
+              <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">File mới nhất</h6>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Tên file</th>
+                        <th>Loại</th>
+                        <th>Ngày tải lên</th>
+                      </tr>
+                    </thead>
+                    <tbody id="recentFilesTable">
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-lg-4 mb-4">
+            <div class="card shadow h-100">
+              <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Thống kê</h6>
+              </div>
+              <div class="card-body">
+                <div class="chart-pie pt-4">
+                  <canvas id="fileTypeChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="tab-pane fade" id="files">
+        <div class="card shadow mb-4">
+          <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Danh sách file</h6>
+            <div class="d-flex">
+              <input type="text" class="form-control me-2" id="searchInput" placeholder="Tìm kiếm...">
+              <select class="form-select me-2" id="fileTypeFilter" style="width: 120px;">
+               
+              </select>
+              <select class="form-select me-2" id="itemsPerPageSelect" style="width: 100px;">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="500">500</option>
+              </select>
+              <button class="btn btn-primary" id="refreshFiles">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered table-hover">
+                <thead>
+                  <tr>
+                    <th>Preview</th>
+                    <th>Tên file</th>
+                    <th>Kích thước</th>
+                    <th>Ngày tải lên</th>
+                    <th>Hành động</th>
+                  </tr>
+                </thead>
+                <tbody id="filesTableBody">
+                </tbody>
+              </table>
+            </div>
+            <nav aria-label="Page navigation">
+              <ul class="pagination justify-content-center" id="pagination">
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+<div class="tab-pane fade" id="announcement">
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">Quản lý thông báo</h6>
+    </div>
+    <div class="card-body">
+      <form id="announcementForm">
+        <div class="mb-3">
+          <label for="announcementTitle" class="form-label">Tiêu đề thông báo</label>
+          <input type="text" class="form-control" id="announcementTitle" placeholder="Nhập tiêu đề">
+        </div>
+        <div class="mb-3">
+          <label for="announcementContent" class="form-label">Nội dung thông báo</label>
+          <textarea class="form-control" id="announcementContent" rows="5" placeholder="Nhập nội dung"></textarea>
+        </div>
+        <div class="mb-3 form-check">
+          <input type="checkbox" class="form-check-input" id="announcementActive">
+          <label class="form-check-label" for="announcementActive">Hiển thị thông báo</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Lưu thông báo</button>
+      </form>
+    </div>
+  </div>
+</div>
+      
+       <div class="tab-pane fade" id="settings">
+        <div class="card shadow mb-4">
+          <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Cài đặt hệ thống</h6>
+          </div>
+          <div class="card-body">
+            <form id="systemSettingsForm">
+              <div class="mb-3">
+                <label for="maxFileSize" class="form-label">Kích thước file tối đa (MB)</label>
+                <input type="number" class="form-control" id="maxFileSize" value="100" min="1">
+              </div>
+              <div class="mb-3">
+                <label for="maxFiles" class="form-label">Số file tối đa mỗi lần upload</label>
+                <input type="number" class="form-control" id="maxFiles" value="10" min="1">
+              </div>
+              <button type="submit" class="btn btn-primary">Lưu cài đặt</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>    
+  </div>
+
+   <div class="modal fade" id="changePasswordModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Đổi mật khẩu</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="changePasswordForm">
+            <div class="mb-3">
+              <label for="currentPassword" class="form-label">Mật khẩu hiện tại</label>
+              <input type="password" class="form-control" id="currentPassword" required>
+            </div>
+            <div class="mb-3">
+              <label for="newPassword" class="form-label">Mật khẩu mới</label>
+              <input type="password" class="form-control" id="newPassword" required>
+            </div>
+            <div class="mb-3">
+              <label for="confirmPassword" class="form-label">Nhập lại mật khẩu mới</label>
+              <input type="password" class="form-control" id="confirmPassword" required>
+            </div>
+            <div class="alert alert-danger d-none" id="passwordError"></div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn btn-primary" id="savePasswordBtn">Lưu thay đổi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+   <div class="modal fade" id="filePreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="previewModalTitle">File Preview</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body text-center">
+          <img id="imagePreview" src="" alt="Preview" class="img-fluid" style="max-height: 70vh; display: none;">
+          <video id="videoPreview" controls class="img-fluid" style="max-height: 70vh; display: none;"></video>
+          <div id="otherFilePreview" style="display: none;">
+            <i class="fas fa-file fa-5x mb-3"></i>
+            <p>Không có preview cho loại file này</p>
+          </div>
+          <div class="mt-3">
+            <a href="#" id="downloadLink" class="btn btn-primary">
+              <i class="fas fa-download me-2"></i>Tải xuống
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+     let currentPage = 1;
+    let itemsPerPage = 10;
+    let fileTypeChart = null;
+    let totalRecords = 0;
+    
+     document.addEventListener('DOMContentLoaded', function() {
+       checkAuth();
+      
+      document.getElementById('sidebarToggle').addEventListener('click', function() {
+        document.querySelector('.sidebar').classList.toggle('active');
+        document.querySelector('.main-content').classList.toggle('active');
+      });
+      
+      loadDashboardData();
+      
+      loadFiles();
+      
+      document.getElementById('searchInput').addEventListener('input', debounce(function() {
+        currentPage = 1;
+        loadFiles();
+      }, 300));
+      
+      document.getElementById('fileTypeFilter').addEventListener('change', function() {
+        currentPage = 1;
+        loadFiles();
+      });
+      
+      document.getElementById('itemsPerPageSelect').addEventListener('change', function() {
+        itemsPerPage = parseInt(this.value);
+        currentPage = 1;
+        loadFiles();
+      });
+      
+      document.getElementById('refreshFiles').addEventListener('click', function() {
+        loadDashboardData();
+        loadFiles();
+      });
+      
+      document.getElementById('savePasswordBtn').addEventListener('click', changePassword);
+      
+      const tabLinks = document.querySelectorAll('[data-bs-toggle="tab"]');
+      tabLinks.forEach(link => {
+        link.addEventListener('shown.bs.tab', function(e) {
+          if (e.target.getAttribute('href') === '#dashboard') {
+            loadDashboardData();
+          } else if (e.target.getAttribute('href') === '#files') {
+            loadFiles();
+          }
+        });
+      });
+      
+      document.getElementById('systemSettingsForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const maxFileSize = Number(document.getElementById('maxFileSize').value);
+        const maxFiles = Number(document.getElementById('maxFiles').value);
+        
+        saveSystemSettings(maxFileSize, maxFiles);
+      });
+    });
+    
+    function debounce(func, wait) {
+      let timeout;
+      return function() {
+        const context = this, args = arguments;
+        clearTimeout(timeout);
+        timeout = setTimeout(function() {
+          func.apply(context, args);
+        }, wait);
+      };
+    }
+    
+    async function checkAuth() {
+      try {
+        const response = await fetch('/admin/check-auth');
+        const data = await response.json();
+        
+        if (!data.loggedIn) {
+          window.location.href = '/admin/login';
+        } else {
+          document.getElementById('usernameDisplay').textContent = data.username || 'Admin';
+        }
+      } catch (err) {
+        console.error('Lỗi kiểm tra đăng nhập:', err);
+        window.location.href = '/admin/login';
+      }
+    }
+    
+    async function loadDashboardData() {
+      try {
+        const response = await fetch('/admin/api/stats');
+        const data = await response.json();
+        
+        document.getElementById('totalFiles').textContent = data.totalFiles;
+        document.getElementById('totalSize').textContent = data.totalSizeMB + ' MB';
+        document.getElementById('imageCount').textContent = data.imageCount;
+        document.getElementById('videoCount').textContent = data.videoCount;
+        
+        const recentFilesTable = document.getElementById('recentFilesTable');
+        recentFilesTable.innerHTML = data.recentFiles.map(file => `
+          <tr>
+            <td>${file.name}</td>
+            <td>${file.type || (file.name.match(/\.(jpg|jpeg|png|gif)$/i) ? 'Hình ảnh' : 
+                file.name.match(/\.(mp4|webm|mov)$/i) ? 'Video' : 'Khác')}</td>
+            <td>${new Date(file.uploadDate || Date.now()).toLocaleDateString()}</td>
+          </tr>
+        `).join('');
+        
+        drawFileTypeChart(data);
+      } catch (err) {
+        console.error('Lỗi khi load dữ liệu dashboard:', err);
+      }
+    }
+    
+    function drawFileTypeChart(data) {
+      const ctx = document.getElementById('fileTypeChart').getContext('2d');
+      
+      if (fileTypeChart) {
+        fileTypeChart.destroy();
+      }
+      
+      fileTypeChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Hình ảnh', 'Video', 'Khác'],
+          datasets: [{
+            data: [data.imageCount, data.videoCount, data.otherCount],
+            backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
+            hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
+            hoverBorderColor: "rgba(234, 236, 244, 1)",
+          }],
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.raw || 0;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const percentage = Math.round((value / total) * 100);
+                  return `${label}: ${value} (${percentage}%)`;
+                }
+              }
+            }
+          },
+          cutout: '70%',
+        },
+      });
+    }
+    
+    async function loadFiles() {
+      try {
+        const search = document.getElementById('searchInput').value;
+        const fileType = document.getElementById('fileTypeFilter').value;
+        
+        const tbody = document.getElementById('filesTableBody');
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin me-2"></i>Đang tải...</td></tr>';
+        
+        const response = await fetch(`/admin/api/files?page=${currentPage}&limit=${itemsPerPage}&search=${encodeURIComponent(search)}&type=${fileType}`);
+        const data = await response.json();
+        
+        totalRecords = data.totalRecords || 0;
+        renderFiles(data.files);
+        renderPagination(data.totalPages, data.currentPage);
+        
+        updatePaginationInfo(data);
+      } catch (err) {
+        console.error('Lỗi khi load danh sách file:', err);
+        const tbody = document.getElementById('filesTableBody');
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Lỗi khi tải dữ liệu</td></tr>';
+      }
+    }
+    
+    function renderFiles(files) {
+      const tbody = document.getElementById('filesTableBody');
+      
+      if (!files || files.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center">Không có file nào</td></tr>`;
+        return;
+      }
+      
+      tbody.innerHTML = files.map(file => {
+        let preview = '';
+        if (file.isImage || file.type === 'image' || file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+          preview = `<img src="${file.url}" alt="Preview" class="file-preview" data-bs-toggle="modal" data-bs-target="#filePreviewModal" onclick="showPreview('${file.url}', 'image', '${file.name}')">`;
+        } else if (file.isVideo || file.type === 'video' || file.name.match(/\.(mp4|webm|mov|avi)$/i)) {
+          preview = `<i class="fas fa-file-video fa-3x text-primary" data-bs-toggle="modal" data-bs-target="#filePreviewModal" onclick="showPreview('${file.url}', 'video', '${file.name}')"></i>`;
+        } else {
+          preview = `<i class="fas fa-file fa-3x text-secondary" data-bs-toggle="modal" data-bs-target="#filePreviewModal" onclick="showPreview('${file.url}', 'other', '${file.name}')"></i>`;
+        }
+        
+        const sizeInMB = file.size ? (file.size / (1024 * 1024)).toFixed(2) : 'N/A';
+        const uploadDate = file.uploadDate ? new Date(file.uploadDate).toLocaleString() : new Date().toLocaleString();
+        
+        return `
+          <tr>
+            <td>${preview}</td>
+            <td>${file.name}</td>
+            <td>${sizeInMB} MB</td>
+            <td>${uploadDate}</td>
+            <td>
+              <button class="btn btn-sm btn-danger" onclick="deleteFile('${file._id || file.name}')">
+                <i class="fas fa-trash"></i> Xóa
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+    
+    function renderPagination(totalPages, currentPage) {
+      const pagination = document.getElementById('pagination');
+      
+      if (itemsPerPage === 0 || totalPages <= 1) {
+        pagination.innerHTML = '';
+        return;
+      }
+      
+      let html = '';
+      const maxVisiblePages = 5;
+      let startPage, endPage;
+      
+      if (totalPages <= maxVisiblePages) {
+        startPage = 1;
+        endPage = totalPages;
+      } else {
+        const maxPagesBeforeCurrent = Math.floor(maxVisiblePages / 2);
+        const maxPagesAfterCurrent = Math.ceil(maxVisiblePages / 2) - 1;
+        
+        if (currentPage <= maxPagesBeforeCurrent) {
+          startPage = 1;
+          endPage = maxVisiblePages;
+        } else if (currentPage + maxPagesAfterCurrent >= totalPages) {
+          startPage = totalPages - maxVisiblePages + 1;
+          endPage = totalPages;
+        } else {
+          startPage = currentPage - maxPagesBeforeCurrent;
+          endPage = currentPage + maxPagesAfterCurrent;
+        }
+      }
+      
+      html += `
+        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+          <a class="page-link" href="#" onclick="changePage(${currentPage - 1})" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+      `;
+      
+      if (startPage > 1) {
+        html += `
+          <li class="page-item">
+            <a class="page-link" href="#" onclick="changePage(1)">1</a>
+          </li>
+        `;
+        if (startPage > 2) {
+          html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        html += `
+          <li class="page-item ${i === currentPage ? 'active' : ''}">
+            <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+          </li>
+        `;
+      }
+      
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+        html += `
+          <li class="page-item">
+            <a class="page-link" href="#" onclick="changePage(${totalPages})">${totalPages}</a>
+          </li>
+        `;
+      }
+      
+      html += `
+        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+          <a class="page-link" href="#" onclick="changePage(${currentPage + 1})" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      `;
+      
+      pagination.innerHTML = html;
+    }
+    
+    function updatePaginationInfo(data) {
+      const startItem = itemsPerPage * (currentPage - 1) + 1;
+      let endItem = itemsPerPage * currentPage;
+      if (endItem > totalRecords) endItem = totalRecords;
+      
+      const cardFooter = document.querySelector('#files .card-footer');
+      if (!cardFooter) {
+        const card = document.querySelector('#files .card');
+        const footer = document.createElement('div');
+        footer.className = 'card-footer text-muted';
+        footer.innerHTML = `Hiển thị ${startItem}-${endItem} của ${totalRecords} file`;
+        card.appendChild(footer);
+      } else {
+        cardFooter.innerHTML = `Hiển thị ${startItem}-${endItem} của ${totalRecords} file`;
+      }
+    }
+    
+    function changePage(page) {
+      currentPage = page;
+      loadFiles();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    async function deleteFile(fileId) {
+      if (!confirm('Bạn có chắc chắn muốn xóa file này?')) return;
+      
+      try {
+        const response = await fetch(`/admin/api/files/${encodeURIComponent(fileId)}`, {
+          method: 'DELETE'
+        });
+        
+        if (response.ok) {
+          loadDashboardData();
+          loadFiles();
+        } else {
+          const error = await response.json();
+          alert(`Lỗi: ${error.error}`);
+        }
+      } catch (err) {
+        console.error('Lỗi khi xóa file:', err);
+        alert('Lỗi khi xóa file');
+      }
+    }
+    
+    function showPreview(url, type, filename) {
+      const imagePreview = document.getElementById('imagePreview');
+      const videoPreview = document.getElementById('videoPreview');
+      const otherFilePreview = document.getElementById('otherFilePreview');
+      const downloadLink = document.getElementById('downloadLink');
+      const previewModalTitle = document.getElementById('previewModalTitle');
+      
+      imagePreview.style.display = 'none';
+      videoPreview.style.display = 'none';
+      otherFilePreview.style.display = 'none';
+      
+      if (type === 'image') {
+        imagePreview.src = url;
+        imagePreview.style.display = 'block';
+        previewModalTitle.textContent = filename || 'Xem hình ảnh';
+      } else if (type === 'video') {
+        videoPreview.src = url;
+        videoPreview.style.display = 'block';
+        previewModalTitle.textContent = filename || 'Xem video';
+      } else {
+        otherFilePreview.style.display = 'block';
+        previewModalTitle.textContent = filename || 'Xem file';
+      }
+      
+      downloadLink.href = url;
+      downloadLink.download = filename || url.split('/').pop();
+    }
+    
+    async function changePassword() {
+      const currentPassword = document.getElementById('currentPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const errorElement = document.getElementById('passwordError');
+      
+      errorElement.classList.add('d-none');
+      errorElement.textContent = '';
+      
+      if (newPassword !== confirmPassword) {
+        errorElement.textContent = 'Mật khẩu mới không khớp';
+        errorElement.classList.remove('d-none');
+        return;
+      }
+      
+      if (newPassword.length < 6) {
+        errorElement.textContent = 'Mật khẩu phải có ít nhất 6 ký tự';
+        errorElement.classList.remove('d-none');
+        return;
+      }
+      
+      try {
+        const response = await fetch('/admin/change-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            currentPassword,
+            newPassword
+          })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          alert('Đổi mật khẩu thành công!');
+          bootstrap.Modal.getInstance(document.getElementById('changePasswordModal')).hide();
+          document.getElementById('changePasswordForm').reset();
+        } else {
+          errorElement.textContent = result.error || 'Đổi mật khẩu thất bại';
+          errorElement.classList.remove('d-none');
+        }
+      } catch (err) {
+        console.error('Lỗi khi đổi mật khẩu:', err);
+        errorElement.textContent = 'Lỗi kết nối';
+        errorElement.classList.remove('d-none');
+      }
+    }
+    
+    async function saveSystemSettings(maxFileSize, maxFiles) {
+      try {
+        const response = await fetch('/admin/api/settings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ maxFileSize, maxFiles })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          alert('Đã lưu cài đặt thành công!');
+        } else {
+          alert('Lỗi khi lưu cài đặt: ' + (result.error || ''));
+        }
+      } catch (err) {
+        console.error('Lỗi khi lưu cài đặt:', err);
+        alert('Lỗi kết nối khi lưu cài đặt');
+      }
+    }
+    
+    window.changePage = changePage;
+    window.deleteFile = deleteFile;
+    window.showPreview = showPreview;
+document.getElementById('announcementForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const title = document.getElementById('announcementTitle').value;
+  const content = document.getElementById('announcementContent').value;
+  const active = document.getElementById('announcementActive').checked;
+  
+  try {
+    const response = await fetch('/admin/api/announcement', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, content, active })
+    });
+    
+    const result = await response.json();
+    if (result.success) {
+      alert('Đã lưu thông báo thành công!');
+    } else {
+      alert('Lỗi khi lưu thông báo');
+    }
+  } catch (err) {
+    console.error('Lỗi khi lưu thông báo:', err);
+    alert('Lỗi kết nối');
+  }
+});
+
+document.querySelector('[href="#announcement"]').addEventListener('shown.bs.tab', loadAnnouncement);
+
+async function loadAnnouncement() {
+  try {
+    const response = await fetch('/api/announcement');
+    const data = await response.json();
+    
+    document.getElementById('announcementTitle').value = data.title || '';
+    document.getElementById('announcementContent').value = data.content || '';
+    document.getElementById('announcementActive').checked = data.active || false;
+  } catch (err) {
+    console.error('Lỗi khi tải thông báo:', err);
+  }
+}
+  </script>
+</body>
+</html>
